@@ -8,6 +8,14 @@ precompilation.
 php  -S localhost:8000 -t app server.php
 ```
 
+NPM dependencies
+---
+
+```bash
+npm install -g bower less coffee-script browserify brfs
+```
+
+
 License
 ---
 
