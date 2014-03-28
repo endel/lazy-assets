@@ -66,6 +66,11 @@ function public_dir($segments='') {
 	return 'app/' . $segments;
 }
 
+$compiler_options = array(
+	'browserify' => '-t brfs',
+	'coffee' => '-pc'
+);
+
 //
 if ($extension === "html") {
 	$document = file_get_contents($_SERVER['SCRIPT_FILENAME']);
@@ -79,9 +84,13 @@ if ($extension === "html") {
 		file_put_contents('php://stdout', json_encode($attributes) . PHP_EOL);
 
 		$extension = pathinfo($attributes['href'], PATHINFO_EXTENSION);
-		if ($extension == "coffee") {
+		if (isset($attributes['compile'])) {
+			array_push($javascripts, $attributes['href'] . '?compile=' . $attributes['compile']);
+
+		} else if ($extension == "coffee" || $extension == "js") {
 			array_push($javascripts, $attributes['href']);
-		} else if ($extension == "less") {
+
+		} else if ($extension == "less" || $extension == "css" || $extension == "scss" || $extension == "sass" || $extension == "styl") {
 			array_push($stylesheets, $attributes['href']);
 
 		} else if (isset($attributes['source']) && $attributes['source'] == 'bower') {
@@ -133,6 +142,11 @@ if ($extension === "html") {
 	}
 
 	$document = preg_replace('/<assets(.*)<\/assets>/si', $assets_html, $document);
+
+} else if (isset($_GET['compile'])) {
+	$options = isset($compiler_options[$_GET['compile']]) ? $compiler_options[$_GET['compile']] : '';
+	exec($_GET['compile'] . ' ' . $options . ' ' . $_SERVER['SCRIPT_FILENAME'], $document, $return_val);
+	$document = join("\n", $document);
 
 } else if ($extension == "less") {
 	// compile less
