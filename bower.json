@@ -1,0 +1,20 @@
+{
+  "name": "lazy-asset-manager",
+  "version": "0.0.0",
+  "authors": [
+    "Endel Dreyer <endel.dreyer@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/dependencies/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.1.1",
+    "ractive": "~0.3.9"
+  }
+}
