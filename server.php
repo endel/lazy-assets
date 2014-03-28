@@ -1,14 +1,17 @@
 <?php
 
 $extension = pathinfo($_SERVER['SCRIPT_FILENAME'], PATHINFO_EXTENSION);
-$document = file_get_contents($_SERVER['SCRIPT_FILENAME']);
 $mime_types = array(
 	'txt' => 'text/plain',
 	'htm' => 'text/html',
 	'html' => 'text/html',
 	'php' => 'text/html',
+
 	'css' => 'text/css',
+	'less' => 'text/css',
+
 	'js' => 'application/javascript',
+	'coffee' => 'application/javascript',
 	'json' => 'application/json',
 	'xml' => 'application/xml',
 	'swf' => 'application/x-shockwave-flash',
@@ -65,6 +68,7 @@ function public_dir($segments='') {
 
 //
 if ($extension === "html") {
+	$document = file_get_contents($_SERVER['SCRIPT_FILENAME']);
 	$stylesheets = array();
 	$javascripts = array();
 
@@ -74,11 +78,17 @@ if ($extension === "html") {
 		$attributes = array_combine($attrs[1], $attrs[2]);
 		file_put_contents('php://stdout', json_encode($attributes) . PHP_EOL);
 
-		if (isset($attributes['source']) && $attributes['source'] == 'bower') {
+		$extension = pathinfo($attributes['href'], PATHINFO_EXTENSION);
+		if ($extension == "coffee") {
+			array_push($javascripts, $attributes['href']);
+		} else if ($extension == "less") {
+			array_push($stylesheets, $attributes['href']);
+
+		} else if (isset($attributes['source']) && $attributes['source'] == 'bower') {
 			$bower_root = json_decode(file_get_contents('.bowerrc'), true)['directory'];
 			$bower_file = $bower_root . $attributes['href'] . '/bower.json';
 
-			if (!file_exists($bower_file)) {
+			if (!is_dir($bower_root . $attributes['href'])) {
 				file_put_contents('php://stdout', "Installing '{$attributes['href']}' package from bower.");
 				exec('bower install -S '. $attributes['href']);
 			}
@@ -123,6 +133,19 @@ if ($extension === "html") {
 	}
 
 	$document = preg_replace('/<assets(.*)<\/assets>/si', $assets_html, $document);
+
+} else if ($extension == "less") {
+	// compile less
+	exec('lessc ' . $_SERVER['SCRIPT_FILENAME'], $document, $return_val);
+	$document = join("\n", $document);
+
+} else if ($extension == "coffee") {
+	// compile less
+	exec('coffee -pc ' . $_SERVER['SCRIPT_FILENAME'], $document, $return_val);
+	$document = join("\n", $document);
+} else {
+	file_put_contents('php://stdout', $_SERVER['SCRIPT_FILENAME']);
+	$document = file_get_contents($_SERVER['SCRIPT_FILENAME']);
 }
 
 echo $document;
