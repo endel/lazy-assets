@@ -15,13 +15,15 @@ Currently there is just a 'development' mode, where `asset` definitions are
 evaluated and dynamically converted to a valid HTML tag, with on-demand
 compilation.
 
-    <!-- Source -->
+**Source**
+
     <assets>
       <asset href="bootstrap" source="bower" />
       <asset href="jquery" source="bower" />
     </assets>
 
-    <!-- Result -->
+**Result**
+
     <link href="dependencies/bootstrap/dist/css/bootstrap.css" rel="stylesheet" media="all" type="text/css" />
     <script type="text/javascript" src="dependencies/bootstrap/dist/js/bootstrap.js"></script>
     <script type="text/javascript" src="dependencies/jquery/dist/jquery.js"></script>
@@ -29,7 +31,6 @@ compilation.
 On 'production' mode (not implemented yet) each asset category shall be
 pre-compiled and compressed into a single file:
 
-    <!-- Result -->
     <link href="dist/app.min.css" rel="stylesheet" media="all" type="text/css" />
     <script type="text/javascript" src="dist/app.min.js"></script>
 
