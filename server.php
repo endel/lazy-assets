@@ -102,7 +102,7 @@ if ($extension === "html") {
 				exec('bower install -S '. $attributes['href']);
 			}
 
-			$bower = json_decode(file_get_contents($bower_file), true);
+			$bower = (file_exists($bower_file)) ? json_decode(file_get_contents($bower_file), true) : array();
 			$files = null;
 
 			if (isset($bower['main'])) {
