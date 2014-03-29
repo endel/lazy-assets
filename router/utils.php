@@ -1,6 +1,6 @@
 <?php
 
-class MimeType {
+class Utils {
 
 	protected static $types = array(
 		'txt' => 'text/plain',
@@ -70,8 +70,16 @@ class MimeType {
 		'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
 	);
 
-	public static function getByExtension($extension) {
+	public static function getMimeType($extension) {
 		return static::$types[ $extension ];
+	}
+
+	public static function glob($pattern, $flags = 0) {
+		$files = glob($pattern, $flags);
+		foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir) {
+			$files = array_merge($files, self::glob($dir.'/'.basename($pattern), $flags));
+		}
+		return $files;
 	}
 
 }

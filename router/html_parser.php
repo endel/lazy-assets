@@ -42,6 +42,12 @@ class HTMLParser {
 			$data['href'] .= '?compile=' . $data['compile'];
 		}
 
+		// prevent cache
+		if (!isset($data['source'])) {
+			$data['href'] .= (strpos($data['href'], '?') !== false) ? '&' : '?';
+			$data['href'] .= uniqid();
+		}
+
 		if (in_array($ext, $this->javascript_extensions)) {
 			array_push($this->javascripts, $data['href']);
 
@@ -49,40 +55,79 @@ class HTMLParser {
 			array_push($this->stylesheets, $data['href']);
 
 		} else if (isset($data['source']) && $data['source'] == 'bower') {
-			$bower_root = json_decode(file_get_contents('.bowerrc'), true)['directory'];
-			$bower_file = $bower_root . $data['href'] . '/bower.json';
+			$this->evaluate_bower($data);
+		}
 
-			if (!is_dir($bower_root . $data['href'])) {
-				file_put_contents('php://stdout', "Installing '{$data['href']}' package from bower.");
+	}
 
-				exec('bower install -S '. $data['href'], $output, $return_val);
-				if ($return_val != 0) {
-					die(join("\n", $output));
-				}
+	protected function evaluate_bower($data) {
+		$bower_root = json_decode(file_get_contents('.bowerrc'), true)['directory'];
+		$package_name = $data['href'];
+		$package_dir = $bower_root . '/' . $package_name;
+
+		if (!is_dir($package_dir)) {
+			file_put_contents('php://stdout', "Installing '{$package_name}' package from bower." . PHP_EOL);
+
+			exec('bower install -S '. $package_name, $output, $return_val);
+			if ($return_val != 0) {
+				die(join("<br />", $output));
 			}
+		}
 
-			$bower = (file_exists($bower_file)) ? json_decode(file_get_contents($bower_file), true) : array();
-			$files = null;
+		$files = null;
 
-			if (isset($bower['main'])) {
+		// forced 'main' files?
+		if (isset($data['main'])) {
+			$files = preg_split('/,/', $data['main']);
+
+		} else {
+
+			// try to parse 'main' from bower.json
+			$bower_file = $package_dir . '/bower.json';
+			$bower = (file_exists($bower_file)) ? json_decode(file_get_contents($bower_file), true) : null;
+
+			if ($bower && isset($bower['main'])) {
 				$files = $bower['main'];
-			} else if (isset($data['main'])) {
-				$files = preg_split('/,/', $data['main']);
+			} else {
+
+				// try to detect main file with some patterns
+				$patterns = array(
+					$package_dir . '/' . $package_name . '.js',
+					$package_dir . '/jquery.' . $package_name . '.js',
+					$package_dir . '/{dist,build}/' . $package_name . '.js',
+					$package_dir . '/{dist,build}/jquery.' . $package_name . '.js',
+				);
+
+				foreach($patterns as $pattern) {
+					$files = glob($pattern, GLOB_BRACE);
+					file_put_contents('php://stdout', "'{$pattern}' => " . json_encode($files) . PHP_EOL);
+					if ($files && !empty($files)) {
+						foreach($files as &$file) {
+							// normalize for further reference
+							$file = str_replace($package_dir . '/', '', $file);
+						}
+						break;
+					}
+				}
+
 			}
 
-			if (!$files) {
-				die("'{$data['href']}' should define 'main' file(s).");
-			}
+		}
 
-			if (is_string($files)) {
-				$files = array($files);
-			}
+		if (!$files) {
+			die("'{$package_name}' should define 'main' file(s).");
+		}
 
-			foreach($files as $file) {
-				$this->evaluate_item(array(
-					'href' => basename($bower_root) . '/' . $data['href'] . '/' . str_replace("./", "", $file)
-				));
-			}
+		if (is_string($files)) {
+			$files = array($files);
+		}
+
+		$root_base = basename($_SERVER['DOCUMENT_ROOT']);
+		$assets_root = preg_replace("/^{$root_base}\//", "", $bower_root);
+		foreach($files as $file) {
+			$this->evaluate_item(array(
+				'href' => $assets_root . '/' . $package_name . '/' . str_replace("./", "", $file)
+			));
 		}
 
 	}
