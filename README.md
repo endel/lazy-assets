@@ -8,6 +8,9 @@ precompilation.
 php -S localhost:8000 -t app router/router.php
 ```
 
+**MAMP Users**: You should use PHP 5.4.0 or greater. Check what version
+you have and run: `/Applications/MAMP/bin/php/php5.4.0/bin/php -S localhost:8000 -t app router/router.php`
+
 How to use
 ---
 
