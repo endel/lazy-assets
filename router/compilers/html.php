@@ -1,68 +1,94 @@
 <?php
 
-class HTMLParser {
-
+class Html {
+	protected $filename;
 	protected $document;
-	protected $javascripts;
-	protected $stylesheets;
+
+	public $assets;
+	public $javascripts;
+	public $stylesheets;
+	public $fonts;
 
 	protected $javascript_extensions = array('coffee', 'js', 'jsx');
 	protected $stylesheet_extensions = array('less', 'css', 'scss', 'sass', 'styl');
+	protected $font_extensions = array('svg', 'eot', 'woff', 'ttf');
 
-	public function __construct($filepath) {
-		$this->document = file_get_contents($filepath);
+	public function __construct($filename) {
+		$this->filename = $filename;
+		$this->document = file_get_contents($filename);
 		$this->stylesheets = array();
 		$this->javascripts = array();
+		$this->fonts = array();
 	}
 
 	public function parse() {
-		$assets_html = "";
-		preg_match_all('/<asset ([^>]+)\/>/', $this->document, $assets);
+		preg_match_all('/<asset ([^>]+)\/>/', $this->document, $asset_tags);
+		$this->assets = array();
 
-		foreach($assets[1] as $asset) {
-			preg_match_all('/([a-z_-]+)=[\'"]([^\'"]+)[\'"]/', $asset, $attributes);
-			$this->evaluate_item(array_combine($attributes[1], $attributes[2]));
+		foreach($asset_tags[1] as $asset_tag) {
+			preg_match_all('/([a-z_-]+)=[\'"]([^\'"]+)[\'"]/', $asset_tag, $attributes);
+			$asset = array_combine($attributes[1], $attributes[2]);
+			array_push($this->assets, $asset);
+			$this->evaluate_item($asset);
 		}
 
+		return $this;
+	}
+
+	public function toString() {
+		$assets_html = "";
 		foreach($this->stylesheets as $stylesheet) {
 			$assets_html .= '<link href="'.$stylesheet.'" rel="stylesheet" media="all" type="text/css" />' . "\n";
 		}
 		foreach($this->javascripts as $javascript) {
 			$assets_html .= '<script type="text/javascript" src="'.$javascript.'"></script>' . "\n";
 		}
-
 		return preg_replace('/<assets(.*)<\/assets>/si', $assets_html, $this->document);
 	}
 
+	public function optimize() {
+		// TODO: compress html
+		return $this->toString();
+	}
 
-	protected function evaluate_item($data) {
-		$ext = pathinfo($data['href'], PATHINFO_EXTENSION);
+	protected function evaluate_item($asset) {
+		$ext = pathinfo($asset['href'], PATHINFO_EXTENSION);
 
-		if (isset($data['compile'])) {
-			$data['href'] .= '?compile=' . $data['compile'];
+		if (isset($asset['compile'])) {
+			$asset['href'] .= '?compile=' . $asset['compile'];
 		}
 
 		// prevent cache
-		if (!isset($data['source'])) {
-			$data['href'] .= (strpos($data['href'], '?') !== false) ? '&' : '?';
-			$data['href'] .= uniqid();
+		if (!isset($asset['source'])) {
+// 			// try to get packages that doesn't exist from 'bower'
+// 			$package_exists = glob($asset['href']);
+// 			if (empty($package_exists)) {
+// 				$asset['source'] = 'bower';
+//
+// 			} else {
+				$asset['href'] .= (strpos($asset['href'], '?') !== false) ? '&' : '?';
+				$asset['href'] .= uniqid();
+// 			}
 		}
 
 		if (in_array($ext, $this->javascript_extensions)) {
-			array_push($this->javascripts, $data['href']);
+			array_push($this->javascripts, $asset['href']);
 
 		} else if (in_array($ext, $this->stylesheet_extensions)) {
-			array_push($this->stylesheets, $data['href']);
+			array_push($this->stylesheets, $asset['href']);
 
-		} else if (isset($data['source']) && $data['source'] == 'bower') {
-			$this->evaluate_bower($data);
+		} else if (in_array($ext, $this->font_extensions)) {
+			array_push($this->fonts, $asset['href']);
+
+		} else if (isset($asset['source']) && $asset['source'] == 'bower') {
+			$this->evaluate_bower($asset);
 		}
 
 	}
 
-	protected function evaluate_bower($data) {
-		$bower_root = json_decode(file_get_contents('.bowerrc'), true)['directory'];
-		$package_name = $data['href'];
+	protected function evaluate_bower($asset) {
+		$bower_root = static::getBowerRoot();
+		$package_name = $asset['href'];
 		$package_dir = $bower_root . '/' . $package_name;
 
 		if (!is_dir($package_dir)) {
@@ -77,8 +103,8 @@ class HTMLParser {
 		$files = null;
 
 		// forced 'main' files?
-		if (isset($data['main'])) {
-			$files = preg_split('/,/', $data['main']);
+		if (isset($asset['main'])) {
+			$files = preg_split('/,/', $asset['main']);
 
 		} else {
 
@@ -130,6 +156,17 @@ class HTMLParser {
 			));
 		}
 
+	}
+
+	public static function getBowerRoot() {
+		$root = "bower_components";
+		if (file_exists('.bowerrc')) {
+			$bowerrc = json_decode(file_get_contents('.bowerrc'), true);
+			if (isset($bowerrc['directory'])) {
+				$root = $bowerrc['directory'];
+			}
+		}
+		return $root;
 	}
 
 }

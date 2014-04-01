@@ -1,19 +1,14 @@
 <?php
-require 'utils.php';
-require 'html_parser.php';
+require_once 'utils.php';
+
+spl_autoload_register(function($class) {
+	include 'compilers/' . $class . '.php';
+});
 
 class Responder {
 	protected $params;
 
-	protected $compilers = array(
-		'browserify' => 'browserify -t brfs',
-		'coffee' => 'coffee -pc',
-		'less' => 'lessc',
-		// TODO expose custom commandline arguments to the user.
-		'styl' => 'stylus --include node_modules/grunt-contrib-stylus/node_modules/nib/lib/ --include-css -r -f -p'
-	);
-
-	public function __construct($params) {
+	public function __construct($params = array()) {
 		$this->params = $params;
 	}
 
@@ -25,33 +20,29 @@ class Responder {
 
 		$filepath = parse_url($request_uri, PHP_URL_PATH);
 		$extension = pathinfo($filepath, PATHINFO_EXTENSION);
-		header('Content-type: ' . Utils::getMimeType($extension));
+		parse_str(parse_url($request_uri, PHP_URL_QUERY), $options);
 
-		if (isset($this->params['compile'])) {
-			$extension = $this->params['compile'];
+		$options = array_merge($this->params, $options);
+		if (isset($options['compile'])) {
+			$extension = $options['compile'];
 		}
 
 		return call_user_func(array($this, $extension), $filepath);
 	}
 
 	public function html($filepath) {
-		$parser = new HTMLParser($filepath);
+		$parser = new Html($filepath);
 		return $parser->parse();
 	}
 
 	public function __call($name, $args) {
 		$files = glob($args[0]);
 
-		if (isset($this->compilers[$name])) {
-			exec($this->compilers[$name] . ' ' . join(' ', $files), $output, $return_val);
-			return join("\n", $output);
-		} else {
-			$contents = "";
-			foreach($files as $file) {
-				$contents .= file_get_contents($file);
-			}
-			return $contents;
+		$klass = 'BaseCompiler';
+		if (class_exists(ucfirst($name))) {
+			$klass = ucfirst($name);
 		}
+		return new $klass($files);
 	}
 
 }

@@ -1,49 +1,101 @@
-lazy asset manager
+lazy-assets
 ===
 
-proof of concept using `assets` tag as a layer on top of `bower` and asset
-precompilation.
+An opinionated and simple yet powerful build-system approach.
+
+Requirements
+---
+
+- PHP 5.4
+- Node
+
+You need to install the following npm modules globally:
 
 ```bash
-php -S localhost:8000 -t app router/router.php
+npm install -g bower less coffee-script browserify brfs minify uglify-js
 ```
 
-**MAMP Users**: You should use PHP 5.4.0 or greater. Check what version
-you have and run: `/Applications/MAMP/bin/php/php5.4.0/bin/php -S localhost:8000 -t app router/router.php`
+Development server
+---
+
+On "development" mode, `asset` definitions are evaluated and dynamically
+converted to a valid HTML tag. They are compiled on-demand. No "watch"
+required.
+
+```bash
+php -S localhost:8000 -t {input_dir} router/index.php
+```
+
+Production
+---
+
+Provide `input_dir` which your application's code and optionally `output_dir`
+(default is `'public'`). It will take a little time to compile every asset
+you defined.
+
+On "production" mode each asset category is compiled and compressed into a
+single file.
+
+```bash
+php router/index.php {input_dir} [{output_dir}]
+```
 
 How to use
 ---
 
-Currently there is just a 'development' mode, where `asset` definitions are
-evaluated and dynamically converted to a valid HTML tag, with on-demand
-compilation.
+Wrap all your assets with `<assets>` tag, and define each dependency with
+`<asset>` tag.
 
-**Source**
-
-    <assets>
-      <asset href="bootstrap" source="bower" />
-      <asset href="jquery" source="bower" />
-    </assets>
-
-**Result**
-
-    <link href="dependencies/bootstrap/dist/css/bootstrap.css" rel="stylesheet" media="all" type="text/css" />
-    <script type="text/javascript" src="dependencies/bootstrap/dist/js/bootstrap.js"></script>
-    <script type="text/javascript" src="dependencies/jquery/dist/jquery.js"></script>
-
-On 'production' mode (not implemented yet) each asset category shall be
-pre-compiled and compressed into a single file:
-
-    <link href="dist/app.min.css" rel="stylesheet" media="all" type="text/css" />
-    <script type="text/javascript" src="dist/app.min.js"></script>
-
-Dependencies
----
-
-- PHP 5.4
+First you need to start the development server:
 
 ```bash
-npm install -g bower less coffee-script browserify brfs
+php -S localhost:8000 -t app router/index.php
+```
+
+Then define your dependencies:
+
+```html
+<assets>
+  <asset href="jquery" source="bower" />
+  <asset href="bootstrap" source="bower" />
+  <asset href="ractive" source="bower" />
+  <asset href="parsleyjs" source="bower" main="dist/parsley.min.js" />
+  <asset href="datejs" source="bower" main="build/date.js,build/date-pt-BR.js" />
+  <asset href="app.js" compile="browserify" />
+  <asset href="test.less" />
+  <asset href="test.coffee" />
+  <asset href="js/*.js" />
+</assets>
+```
+
+When `http://localhost:8000` is requested, the output of the HTML file will be
+the following:
+
+```html
+<link href="dependencies/bootstrap/dist/css/bootstrap.css?533a476e18588" rel="stylesheet" media="all" type="text/css" />
+<link href="test.less?533a476e18810" rel="stylesheet" media="all" type="text/css" />
+<script type="text/javascript" src="dependencies/jquery/dist/jquery.js?533a476e184a3"></script>
+<script type="text/javascript" src="dependencies/bootstrap/dist/js/bootstrap.js?533a476e1859a"></script>
+<script type="text/javascript" src="dependencies/ractive/build/Ractive.js?533a476e186be"></script>
+<script type="text/javascript" src="dependencies/parsleyjs/dist/parsley.min.js?533a476e18748"></script>
+<script type="text/javascript" src="dependencies/datejs/build/date.js?533a476e187ba"></script>
+<script type="text/javascript" src="dependencies/datejs/build/date-pt-BR.js?533a476e187d6"></script>
+<script type="text/javascript" src="app.js?compile=browserify&533a476e187fa"></script>
+<script type="text/javascript" src="test.coffee?533a476e18822"></script>
+<script type="text/javascript" src="js/*.js?533a476e1883e"></script>
+```
+
+Now let's compile it for production:
+
+```bash
+php router/index.php app
+```
+
+Result:
+
+```html
+<link href="index.css" rel="stylesheet" media="all" type="text/css" />
+<script type="text/javascript" src="index.js"></script>
 ```
 
 License
