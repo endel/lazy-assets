@@ -12,7 +12,7 @@ Requirements
 You need to install the following npm modules globally:
 
 ```bash
-npm install -g bower less coffee-script browserify brfs minify uglify-js
+npm install -g bower less stylus coffee-script browserify brfs minify uglify-js
 ```
 
 Development server
