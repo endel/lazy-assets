@@ -94,8 +94,8 @@ php router/index.php app
 Result:
 
 ```html
-<link href="index.css" rel="stylesheet" media="all" type="text/css" />
-<script type="text/javascript" src="index.js"></script>
+<link href="index.css?533afd8c542ee" rel="stylesheet" media="all" type="text/css" />
+<script type="text/javascript" src="index.js?533afd8c542fd"></script>
 ```
 
 License
