@@ -1,7 +1,7 @@
 lazy-assets
 ===
 
-An opinionated and simple yet powerful build-system approach.
+An opinionated and simple build-system approach.
 
 Requirements
 ---
