@@ -118,16 +118,22 @@ class Html {
 			} else {
 
 				// try to detect main file with some patterns
+				// TODO: it smells we need recursivity here
 				$patterns = array(
 					$package_dir . '/' . $package_name . '.js',
+					$package_dir . '/' . $package_name . '.min.js',
 					$package_dir . '/jquery.' . $package_name . '.js',
+					$package_dir . '/jquery.' . $package_name . '.min.js',
 					$package_dir . '/{dist,build}/' . $package_name . '.js',
+					$package_dir . '/{dist,build}/' . $package_name . '.min.js',
 					$package_dir . '/{dist,build}/jquery.' . $package_name . '.js',
+					$package_dir . '/{dist,build}/jquery.' . $package_name . '.min.js',
 				);
 
 				foreach($patterns as $pattern) {
 					$files = glob($pattern, GLOB_BRACE);
-					file_put_contents('php://stdout', "'{$pattern}' => " . json_encode($files) . PHP_EOL);
+					file_put_contents('php://stdout', "'{$pattern}' => " . json_encode(!empty($files)) . PHP_EOL);
+
 					if ($files && !empty($files)) {
 						foreach($files as &$file) {
 							// normalize for further reference
