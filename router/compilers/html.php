@@ -38,10 +38,10 @@ class Html {
 	public function toString() {
 		$assets_html = "";
 		foreach($this->stylesheets as $stylesheet) {
-			$assets_html .= '<link href="'.$stylesheet.'" rel="stylesheet" media="all" type="text/css" />' . "\n";
+			$assets_html .= '<link href="'.$this->uniq_url($stylesheet).'" rel="stylesheet" media="all" type="text/css" />' . "\n";
 		}
 		foreach($this->javascripts as $javascript) {
-			$assets_html .= '<script type="text/javascript" src="'.$javascript.'"></script>' . "\n";
+			$assets_html .= '<script type="text/javascript" src="'.$this->uniq_url($javascript).'"></script>' . "\n";
 		}
 		return preg_replace('/<assets(.*)<\/assets>/si', $assets_html, $this->document);
 	}
@@ -49,6 +49,11 @@ class Html {
 	public function optimize() {
 		// TODO: compress html
 		return $this->toString();
+	}
+
+	protected function uniq_url($href) {
+		$href .= (strpos($href, '?') !== false) ? '&' : '?';
+		return $href . uniqid();
 	}
 
 	protected function evaluate_item($asset) {
@@ -60,15 +65,11 @@ class Html {
 
 		// prevent cache
 		if (!isset($asset['source'])) {
-// 			// try to get packages that doesn't exist from 'bower'
-// 			$package_exists = glob($asset['href']);
-// 			if (empty($package_exists)) {
-// 				$asset['source'] = 'bower';
-//
-// 			} else {
-				$asset['href'] .= (strpos($asset['href'], '?') !== false) ? '&' : '?';
-				$asset['href'] .= uniqid();
-// 			}
+			// // try to get packages that doesn't exist from 'bower'
+			// $package_exists = glob($asset['href']);
+			// if (empty($package_exists)) {
+			// 	$asset['source'] = 'bower';
+			// }
 		}
 
 		if (in_array($ext, $this->javascript_extensions)) {
