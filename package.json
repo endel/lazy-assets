@@ -1,0 +1,27 @@
+{
+  "author": "Endel Dreyer <endel.dreyer@gmail.com> (http://endel.me)",
+  "name": "lazy-assets",
+  "description": "An opinionated and simple build-system approach.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/endel/lazy-assets",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:endel/lazy-assets.git"
+  },
+  "main": "./lib/lazy-server.js",
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "bin": "./lib/lazy-server.js",
+  "keywords": [
+    "build",
+    "tool",
+    "lazy",
+    "assets"
+  ],
+  "dependencies": {
+    "express": ">= 4.3.1",
+    "tamper": ">= 0.1.0"
+  },
+  "devDependencies": { }
+}
