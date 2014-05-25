@@ -20,6 +20,8 @@
     "parsleyjs": "~1.2.4",
     "ractive": "~0.3.9",
     "webfontloader": "~1.5.2",
-    "webfontloader-min": "~1.5.1"
+    "webfontloader-min": "~1.5.1",
+    "skrollr": "~0.6.21",
+    "jquery": "~2.1.1"
   }
 }
