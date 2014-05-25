@@ -25,9 +25,12 @@
     "express": ">= 4.3.1",
     "tamper": ">= 0.1.0",
     "sync": ">= 0.2.2",
+    "execSync": "*",
     "bower": ">= 1.3.3",
     "less": ">= 1.7.0",
-    "coffee-script": ">= 1.7.1"
+    "coffee-script": ">= 1.7.1",
+    "browserify": ">= 4.1.5",
+    "brfs": ">= 1.1.1"
   },
   "devDependencies": { }
 }
