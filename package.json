@@ -8,11 +8,11 @@
     "type": "git",
     "url": "git@github.com:endel/lazy-assets.git"
   },
-  "main": "./lib/lazy-server.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "tap test/*.js"
   },
-  "bin": "./lib/lazy-server.js",
+  "bin": "./lib/index.js",
   "keywords": [
     "build",
     "tool",
@@ -20,8 +20,10 @@
     "assets"
   ],
   "dependencies": {
+    "yargs": ">= 1.2.2",
     "express": ">= 4.3.1",
-    "tamper": ">= 0.1.0"
+    "tamper": ">= 0.1.0",
+    "bower": ">= 1.3.3"
   },
   "devDependencies": { }
 }
