@@ -6,14 +6,11 @@ An opinionated and simple build-system approach.
 Requirements
 ---
 
-- PHP 5.4
-- Node
-
-You need to install the following npm modules globally:
-
 ```bash
-npm install -g bower less stylus coffee-script browserify brfs minify uglify-js
+npm install -g lazy-assets
 ```
+
+less stylus coffee-script browserify brfs minify uglify-js
 
 Development server
 ---
