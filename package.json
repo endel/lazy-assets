@@ -2,7 +2,7 @@
   "author": "Endel Dreyer <endel.dreyer@gmail.com> (http://endel.me)",
   "name": "lazy-assets",
   "description": "An opinionated and simple build-system approach.",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "homepage": "https://github.com/endel/lazy-assets",
   "repository": {
     "type": "git",

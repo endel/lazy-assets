@@ -3,6 +3,14 @@ lazy-assets
 
 An opinionated and simple build-system approach.
 
+Features:
+---
+
+- JavaScript minification and optimization
+- CSS minification and optimization
+- Bower integration
+- **Zero configuration**
+
 Requirements
 ---
 
@@ -10,31 +18,25 @@ Requirements
 npm install -g lazy-assets
 ```
 
-less stylus coffee-script browserify brfs minify uglify-js
-
 Development server
 ---
 
-On "development" mode, `asset` definitions are evaluated and dynamically
+On development mode, `asset` definitions are evaluated and dynamically
 converted to a valid HTML tag. They are compiled on-demand. No "watch"
 required.
 
 ```bash
-php -S localhost:8000 -t {input_dir} router/index.php
+lazy-assets examples/simple
 ```
 
 Production
 ---
 
-Provide `input_dir` which your application's code and optionally `output_dir`
-(default is `'public'`). It will take a little time to compile every asset
-you defined.
-
-On "production" mode each asset category is compiled and compressed into a
-single file.
+When compiling for production, all your javascripts and stylesheets are
+compressed into a single file.
 
 ```bash
-php router/index.php {input_dir} [{output_dir}]
+lazy-assets {input_dir} {output_dir}
 ```
 
 How to use
@@ -43,10 +45,11 @@ How to use
 Wrap all your assets with `<assets>` tag, and define each dependency with
 `<asset>` tag.
 
-First you need to start the development server:
+To start the development server, run the following: (by default it binds on
+[localhost:3000](http://localhost:3000).)
 
 ```bash
-php -S localhost:8000 -t app router/index.php
+lazy-assets examples/simple
 ```
 
 Then define your dependencies:
@@ -85,15 +88,16 @@ the following:
 Now let's compile it for production:
 
 ```bash
-php router/index.php app
+lazy-assets examples/simple examples/simple-output
 ```
 
 Result:
 
 ```html
-<link href="index.css?533afd8c542ee" rel="stylesheet" media="all" type="text/css" />
-<script type="text/javascript" src="index.js?533afd8c542fd"></script>
+<script type="text/javascript" src="javascripts-533afd8c542fd.js"></script>
+<link href="stylesheets-533afd8c.css" rel="stylesheet" media="all" type="text/css" />
 ```
+
 
 License
 ---
