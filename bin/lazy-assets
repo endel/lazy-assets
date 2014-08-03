@@ -2,22 +2,19 @@
 
 var utils = require('../lib/lazy/utils'),
     createServer = require('../lib/lazy/server');
+    argv = require('yargs').argv,
+    input = argv._[0] || "./",
+    output = argv._[1],
+    path = require('path').resolve(input),
+    port = argv.port || 3000;
 
-// Command-line Interface
-if (!module.parent) {
-  var server, argv = require('yargs').argv,
-      path = argv._[0] || "./",
-      output = argv._[1],
-      port = argv.port || 3000;
+// Set bower_components directory
+utils.bower.setBasePath(path);
 
-  // Set bower_components directory
-  utils.bower.setBasePath(path);
-
-  if (!output) {
-    createServer({ path: path }).listen(port);
-    console.log("Serving '" + path + "' at http://localhost:" + port + '/');
-  } else {
-    var compiler = require('../lib/lazy/compiler').compile(path, output);
-    console.log("Compiled successfully at: '" + output + "'");
-  }
+if (!output) {
+  createServer({ path: path }).listen(port);
+  console.log("Serving '" + input + "' at http://localhost:" + port + '/');
+} else {
+  var compiler = require('./lazy/compiler').compile(path, output);
+  console.log("Compiled successfully at: '" + output + "'");
 }
