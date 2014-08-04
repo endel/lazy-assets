@@ -15,6 +15,6 @@ if (!output) {
   createServer({ path: path }).listen(port);
   console.log("Serving '" + input + "' at http://localhost:" + port + '/');
 } else {
-  var compiler = require('./lazy/compiler').compile(path, output);
+  var compiler = require('../lib/lazy/compiler').compile(path, output);
   console.log("Compiled successfully at: '" + output + "'");
 }

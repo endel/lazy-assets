@@ -37,7 +37,7 @@
     "coffeeify": "~0.6.0",
     "brfs": "~1.1.1",
     "chokidar": "~0.8.2",
-    "imageoptim-cli": "~1.7.11"
+    "imagemin": "~0.4.6"
   },
   "devDependencies": { }
 }
