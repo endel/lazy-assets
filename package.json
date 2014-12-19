@@ -2,7 +2,7 @@
   "author": "Endel Dreyer <endel.dreyer@gmail.com> (http://endel.me)",
   "name": "lazy-assets",
   "description": "An opinionated and simple build-system approach.",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "homepage": "https://github.com/endel/lazy-assets",
   "repository": {
     "type": "git",
@@ -35,9 +35,7 @@
     "coffee-script": "~1.7.1",
     "browserify": "~4.1.5",
     "coffeeify": "~0.6.0",
-    "brfs": "~1.1.1",
-    "chokidar": "~0.8.2",
-    "imagemin": "~0.4.6"
+    "chokidar": "~0.8.2"
   },
   "devDependencies": { }
 }
